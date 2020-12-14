@@ -1,0 +1,91 @@
+!pip install beautifulsoup4
+!pip install -U selenium
+!pip install webdriver_manager --user
+
+from selenium import webdriver
+from bs4 import BeautifulSoup
+import pandas as pd
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+driver = webdriver.Chrome(ChromeDriverManager().install())
+content = driver.page_source
+soup = BeautifulSoup(content)
+driver.get('https://www.classcentral.com/subject/data-science')
+
+Course = []
+Duration = []
+Start_Date = []
+Offered_By = []
+No_Of_Reviews = []
+Rating = []
+def find_2nd(string, substring):
+    return string.find(substring, string.find(substring) + 1)
+def find_1st(string, substring):
+    return string.find(substring, string.find(substring))
+for i in soup.findAll("span",{'class' : 'text-1 weight-semi line-tight'}):
+    b = str(i)
+    print(b[find_1st(b,'>')+1:find_2nd(b,'<')])
+    Course.append(b[find_1st(b,'>')+1:find_2nd(b,'<')])
+	course = []
+for i in Course:
+    i = i.strip()
+  print(i)
+    course.append(i)
+	
+# Provider/Offered By:
+for i in soup.findAll('a',href=True, attrs={'class':'color-charcoal italic'}):
+    b = str(i)
+    #print(b[find_1st(b,'>')+1:find_2nd(b,'<')])
+    Offered_By.append(b[find_1st(b,'>')+1:find_2nd(b,'<')])
+provider = []
+for i in Offered_By:
+    i = i.strip()
+    provider.append(i
+	
+	# rating:
+rat = []
+for d in soup.findAll('div', attrs={'class':'col border-box text-center nowrap row large-up-text-right padding-horz-small push'}):
+    abc = d.find('span', attrs={'class':'xlarge-up-hidden color-charcoal text-center'})
+    if abc is not None:
+        #print(rating.text)
+        rat.append(abc.text)
+    else:
+        rat.append('-1')
+for i in rat:
+    i = i.strip()
+    #print(i)
+    Rating.append(i)
+	
+	# Num of Reviews
+for i in soup.findAll("span",{'class' : 'large-down-hidden block line-tight text-4 color-gray'}):
+    b = str(i)
+  # print(b[find_1st(b,'>')+1:find_2nd(b,'<')])
+    No_Of_Reviews.append(b[find_1st(b,'>')+1:find_2nd(b,'<')])
+num_reviews = []
+for i in No_Of_Reviews:
+    i = i.strip()
+    #print(i)
+    num_reviews.append(i) 
+	
+	t = []
+for d in soup.findAll('div', attrs={'class':'small-down-text-2 text-3 row vert-align-middle'}):
+    abc = d.find('span', attrs={'class':'hidden medium-up-inline-block small-down-text-2 text-3 large-up-margin-left-xxsmall icon-clock-charcoal icon-left'})
+    if abc is not None:
+        t.append(abc.text)
+    else:
+        t.append('-1')
+duration = []
+for i in t:
+    i = i.strip()
+    #print(i)
+    duration.append(i)
+durationn = []
+for i in duration:
+    i = ' '.join(i.split())
+    i = i.replace('\n','')
+    durationn.append(i)
+	
+	Now, all we need to do is put all this data into a data frame by running the following lines of code:
+import pandas as pd
+dfDS = pd.DataFrame({'course':course,'ratings': Rating,'No_of_Reviews':num_reviews,
+                  'provider':provider, 'Duration':durationn})
